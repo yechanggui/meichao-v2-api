@@ -166,17 +166,17 @@ class StoreOrderController
         ], true);
         $order = $this->service->getOne(['order_id' => $order_id], 'id,paid,pay_price,order_id,total_price,total_postage,pay_postage,gain_integral');
         if (!$order) return app('json')->fail('订单不存在');
-        $order = $order->toArray();
+        // $order = $order->toArray();
         if (!$order['paid']) {
             if ($price === '') return app('json')->fail('请填写实际支付金额');
             if ($price < 0) return app('json')->fail('实际支付金额不能小于0元');
-            if ($order['pay_price'] == $price) return app('json')->successful('修改成功');
+            if ($order->pay_price == $price) return app('json')->successful('修改成功');
             $order->pay_price = $price;
             if (!$order->save())
                 return app('json')->fail('状态错误');
 
             $services->save([
-                'oid' => $order['id'],
+                'oid' => $order->id,
                 'change_type' => 'order_edit',
                 'change_message' => '修改实际支付金额' . $price,
                 'change_time' => time()
